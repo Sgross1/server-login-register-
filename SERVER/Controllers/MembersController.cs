@@ -19,20 +19,36 @@ namespace SERVER.Controllers
             _context = context;
         }
 
+        // GET: api/members
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers()
+        {
+            // החזרת כל המשתמשים מהדטאבייס
+            return await _context.Users.ToListAsync();
+        }
+
         // POST: api/members/register
         [HttpPost("register")]
         public async Task<ActionResult<AppUser>> Register([FromBody] AppUser user)
         {
-            // בדיקה אם כבר קיים משתמש עם אותו שם
-            if (await _context.Users.AnyAsync(x => x.UserName == user.UserName))
-                return BadRequest("Username already taken");
+            try
+            {
+                // בדיקה אם כבר קיים משתמש עם אותו שם
+                if (await _context.Users.AnyAsync(x => x.UserName == user.UserName))
+                    return BadRequest("Username already taken");
 
-            // הוספה של המשתמש החדש
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+                // הוספה של המשתמש החדש
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
 
-            // החזרה של המשתמש החדש ללקוח
-            return Ok(user);
+                // החזרה של המשתמש החדש ללקוח
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                // במקרה של שגיאת unique constraint או כל שגיאה אחרת
+                return BadRequest("Error creating user: " + ex.Message);
+            }
         }
 
         // POST: api/members/login
