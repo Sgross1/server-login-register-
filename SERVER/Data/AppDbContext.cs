@@ -12,5 +12,16 @@ namespace SERVER.Data
 
         // DbSet מייצג טבלה בבסיס הנתונים
         public DbSet<AppUser> Users { get; set; }
+
+        // הגדרת הדטאבייס - כאן נגדיר unique constraints
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // הגדרת UserName כשדה ייחודי (unique)
+            modelBuilder.Entity<AppUser>()
+                .HasIndex(u => u.UserName)
+                .IsUnique();
+        }
     }
 }

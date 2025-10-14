@@ -1,6 +1,40 @@
 @SERVER_HostAddress = http://localhost:5174
 
-GET {{SERVER_HostAddress}}/weatherforecast/
+# Get all users
+GET {{SERVER_HostAddress}}/api/members
 Accept: application/json
+
+###
+
+# Test user registration
+POST {{SERVER_HostAddress}}/api/members/register
+Content-Type: application/json
+
+{
+  "userName": "testuser",
+  "password": "testpass123"
+}
+
+###
+
+# Test user login
+POST {{SERVER_HostAddress}}/api/members/login
+Content-Type: application/json
+
+{
+  "userName": "testuser",
+  "password": "testpass123"
+}
+
+###
+
+# Test login with wrong password
+POST {{SERVER_HostAddress}}/api/members/login
+Content-Type: application/json
+
+{
+  "userName": "testuser", 
+  "password": "wrongpassword"
+}
 
 ###
