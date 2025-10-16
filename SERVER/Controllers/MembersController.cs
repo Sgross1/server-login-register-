@@ -31,22 +31,27 @@ namespace SERVER.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<AppUser>> Register([FromBody] AppUser user)
         {
+            // נירמול UserName: trim + lowercase
+            user.UserName = (user.UserName ?? string.Empty).Trim().ToLowerInvariant();
+
+            if (string.IsNullOrWhiteSpace(user.UserName) || string.IsNullOrWhiteSpace(user.Password))
+                return BadRequest("Username and Password are required.");
+
             try
             {
-                // בדיקה אם כבר קיים משתמש עם אותו שם
-                if (await _context.Users.AnyAsync(x => x.UserName == user.UserName))
-                    return BadRequest("Username already taken");
-
-                // הוספה של המשתמש החדש
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
-
-                // החזרה של המשתמש החדש ללקוח
-                return Ok(user);
+                return Ok(new { message = "Registration successful!", user });
+            }
+            catch (DbUpdateException dbEx)
+            {
+                // הדפסת שגיאה מלאה לקונסול (כולל inner) כדי לאבחן
+                Console.WriteLine(dbEx.ToString());
+                return Conflict("Username already taken");
             }
             catch (Exception ex)
             {
-                // במקרה של שגיאת unique constraint או כל שגיאה אחרת
+                Console.WriteLine(ex.ToString());
                 return BadRequest("Error creating user: " + ex.Message);
             }
         }
