@@ -2,9 +2,10 @@
 using SERVER.Data;
 var builder = WebApplication.CreateBuilder(args);
 
-// מוסיפים DbContext עם InMemory Database
+// קונפיגורציית DbContext: שימוש ב‑SQLite עם מחרוזת חיבור מהגדרות
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseInMemoryDatabase("MyDb"));
+    options.UseSqlite(connectionString));
 
 // מוסיפים שירותי Controllers
 builder.Services.AddControllers();
@@ -21,6 +22,13 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// יצירת/הכנת DB במעלית כדי למנוע cold-start איטי של EF
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.EnsureCreated();
+}
 
 // שימוש ב-CORS
 app.UseCors("AllowClient");

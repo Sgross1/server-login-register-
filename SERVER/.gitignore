@@ -9,8 +9,9 @@ obj/
 *.userosscache
 *.sln.docstates
 
-# Entity Framework
+# Entity Framework / SQLite / DB files (ignore local DB files)
 *.db
+users.db
 *.sqlite
 *.sqlite3
 
@@ -33,4 +34,4 @@ Thumbs.db
 
 # Package files
 *.nupkg
-*.snupkg
+*.snupkgusers.db
